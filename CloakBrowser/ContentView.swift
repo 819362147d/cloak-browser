@@ -1,5 +1,6 @@
 import SwiftUI
 import WebKit
+import QuartzCore
 
 struct ContentView: View {
     @StateObject private var store = WebViewStore()
@@ -97,6 +98,16 @@ final class WebViewStore: NSObject, ObservableObject, WKNavigationDelegate {
         }
         webView = WKWebView(frame: .zero, configuration: config)
         super.init()
+        // Frame-rate max (v1.3): pin the web view's scroll/render pacing
+        // to this screen's maximum (120 on ProMotion, 60 otherwise),
+        // using the strict min = max = preferred range. Together with
+        // CADisableMinimumFrameDurationOnPhone in Info.plist this is
+        // everything an app can publicly ask for; WebKit still decides
+        // how web content itself is composited.
+        let maxFPS = Float(UIScreen.main.maximumFramesPerSecond)
+        webView.scrollView.preferredFrameRateRange =
+            CAFrameRateRange(minimum: maxFPS, maximum: maxFPS,
+                             preferred: maxFPS)
         webView.navigationDelegate = self
         webView.customUserAgent =
             "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) " +

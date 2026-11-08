@@ -29,6 +29,15 @@ v1.2 已改为命中屏蔽字体时按同字号通用字体（优先用原串自
 
 理论目标：61 → 1（只剩 Emoji）。**以 Codemagic 构建后在真机复测为准，没测之前不算数。**
 
+## 帧率（v1.3）
+App 侧能公开申请的都拉满了：Info.plist 加
+`CADisableMinimumFrameDurationOnPhone = true`（解除系统对本 App 的
+最低帧时长压制），WebView 滚动视图按 min=max=preferred=屏幕上限
+（ProMotion 机型 120）申请帧率区间。
+边界：网页内容本身的合成帧率由 WebKit 进程和页面代码决定，App 锁不住；
+系统级「把整机推向 120」是 GlobalRefresh 那个包的悬浮窗方案的活，
+两个包同时开（GR 后台悬浮窗 + 本浏览器前台）效果等价且不用互相移植。
+
 ## 界面（v1.1 补上）
 顶部地址/搜索两用栏：输完整网址直接打开，输域名自动补 https://，
 输关键词走 DuckDuckGo 搜索（改 `ContentView.swift` 里 `makeURL`
