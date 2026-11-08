@@ -1,0 +1,25 @@
+name: CloakBrowser
+options:
+  bundleIdPrefix: com.cloak
+  deploymentTarget:
+    iOS: "16.0"
+targets:
+  CloakBrowser:
+    type: application
+    platform: iOS
+    sources:
+      - CloakBrowser
+    resources:
+      - CloakBrowser/spoof.js
+    info:
+      path: CloakBrowser/Info.plist
+      properties:
+        UILaunchStoryboardName: ""
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cloak.browser
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
+        TARGETED_DEVICE_FAMILY: "1"

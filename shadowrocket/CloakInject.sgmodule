@@ -1,0 +1,17 @@
+#!name=CloakBrowser 注入（单测版，仅 ip.cx）
+#!desc=经 MITM 在 ip.cx 的 HTML 头部最前面注入 spoof.js，伪装时区/语言/Intl/字体(canvas)/时区偏移。只含 ip.cx 一个域名，先单测分数，确认有效再考虑扩域名。未真机验证。
+#!system=ios
+
+# 使用前必读（缺一不可）：
+# 1) script-path 必须是一个能直达 cloak-response.js 的 https 地址（比如把
+#    shadowrocket/ 整个目录推到 GitHub 后用 raw 地址）。小火箭不能直接
+#    引用手机本地文件路径，把下面 SCRIPT_URL 换成真实地址再导入本模块。
+# 2) 小火箭里要先生成并安装 MITM CA 证书，并在系统设置里开启完全信任
+#    （见 README-SHADOWROCKET.md），否则 HTTPS 解不开、脚本不会执行。
+# 3) 导入后断开重连小火箭一次，在 Safari 打开 ip.cx 复测。
+
+[Script]
+CloakInject = type=http-response, pattern=^https?://ip\.cx(/.*)?$, requires-body=1, max-size=2097152, script-path=SCRIPT_URL, engine=auto
+
+[MITM]
+hostname = %APPEND% ip.cx
