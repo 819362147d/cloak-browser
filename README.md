@@ -23,6 +23,13 @@
 
 理论目标：61 → 1（只剩 Emoji）。**以 Codemagic 构建后在真机复测为准，没测之前不算数。**
 
+## 界面（v1.1 补上）
+顶部地址/搜索两用栏：输完整网址直接打开，输域名自动补 https://，
+输关键词走 DuckDuckGo 搜索（改 `ContentView.swift` 里 `makeURL`
+的模板可换 Google）。底部工具栏：后退 / 前进 / 刷新（加载中变停止）/
+主页（DuckDuckGo）/ 检测页（ip.cx，一键复测）。
+v1.0 只有固定打开 ip.cx 一页、没有这些，是已知的偷工，已修。
+
 ## 硬边界（做之前必须知道）
 1. **只管这个 App 内部的网页。** iOS 沙盒决定了：任何 IPA 都改不了 Safari、
    改不了 Claude App、改不了系统里其他 App 看到的时区/语言。想让 Claude App
