@@ -37,20 +37,26 @@
     }
     return false;
   }
-  // Strip blocked families out of a CSS font string, keep size/style prefix
-  // and generic fallbacks. e.g. '72px "PingFang SC", monospace' -> '72px monospace'
-  function stripBlocked(fontStr) {
-    var m = ('' + fontStr).match(/^([^a-zA-Z"']*)(.*)$/);
-    var prefix = m ? m[1] : '';
-    var rest = m ? m[2] : '' + fontStr;
-    var parts = rest.split(',');
-    var kept = [];
-    for (var i = 0; i < parts.length; i++) {
-      var p = parts[i].trim().replace(/^["']|["']$/g, '');
-      if (p && !fontIsBlocked(p)) kept.push(p);
-    }
-    if (!kept.length) kept.push('sans-serif');
-    return prefix + kept.join(', ');
+  // v1.2 fix: the old stripBlocked() rebuilt the font string wrongly —
+  // '72px "PingFang SC", monospace' became '72monospace', an invalid
+  // canvas font value. Canvas silently ignores invalid assignments, so
+  // the blocked font stayed active and measurement leaked (seen on
+  // device 2026-11-08: fonts still +12 while tz/language went to 0).
+  // New approach: never rebuild the family list. Measure with a generic
+  // font at the SAME size, preferring the string's own generic fallback
+  // ('72px "PingFang SC", monospace' -> measure as '72px monospace'),
+  // which is exactly the baseline detectors compare against.
+  function fallbackFontFor(fontStr) {
+    var s = '' + fontStr;
+    var sizeMatch = s.match(/(\d+(?:\.\d+)?(?:px|pt|em|rem|%))/i);
+    var size = sizeMatch ? sizeMatch[1] : '72px';
+    var parts = s.split(',');
+    var last = parts[parts.length - 1].trim()
+      .replace(/^["']|["']$/g, '').toLowerCase();
+    var generics = ['monospace', 'sans-serif', 'serif', 'system-ui',
+      'ui-monospace', 'ui-sans-serif', 'ui-serif'];
+    var generic = generics.indexOf(last) !== -1 ? last : 'monospace';
+    return size + ' ' + generic;
   }
 
   // ---- 2. navigator.language / languages ----
@@ -117,7 +123,7 @@
     proto.measureText = function (text) {
       if (fontIsBlocked(this.font)) {
         var saved = this.font;
-        this.font = stripBlocked(saved);
+        this.font = fallbackFontFor(saved);
         try { return origMeasure.call(this, text); }
         finally { this.font = saved; }
       }
@@ -131,7 +137,7 @@
       oproto.measureText = function (text) {
         if (fontIsBlocked(this.font)) {
           var saved = this.font;
-          this.font = stripBlocked(saved);
+          this.font = fallbackFontFor(saved);
           try { return oMeasure.call(this, text); }
           finally { this.font = saved; }
         }

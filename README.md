@@ -21,6 +21,12 @@
 | WebRTC 泄露 | 0→0 | 截图里本来就是 0（Safari 不漏），脚本里顺手禁掉 `RTCPeerConnection` 防其他页面 |
 | Emoji Apple 风格 | 1 | 压不掉——真美国 iPhone 也是 Apple 风格，这 1 分检测方自己也标注是弱信号 |
 
+真机进度（2026-11-08）：时区 Europe/London +0、语言 en-GB +0、WebRTC +0
+已实测通过；字体 v1.0 仍被检出 +12，原因是旧 stripBlocked 把
+'72px "PingFang SC"' 拼成了无效的 '72monospace'、canvas 默默忽略赋值。
+v1.2 已改为命中屏蔽字体时按同字号通用字体（优先用原串自带的通用回退）
+量宽，本地模拟通过，待真机复测。
+
 理论目标：61 → 1（只剩 Emoji）。**以 Codemagic 构建后在真机复测为准，没测之前不算数。**
 
 ## 界面（v1.1 补上）
